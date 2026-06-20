@@ -5,7 +5,10 @@
 // VITE_API_BASE_URL to the API origin, e.g. https://api.example.com
 import { loadAuth } from '../auth/storage.js'
 
-const BASE = import.meta.env.VITE_API_BASE_URL || ''
+// Trailing slashes are stripped so `BASE + '/api/...'` never produces a double
+// slash (e.g. `host//api/...`), which Vercel answers with a redirect that a CORS
+// preflight cannot follow.
+const BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
 
 // Bearer token attached to every request. Initialised from storage so a
 // reloaded page is authenticated before the first call; App keeps it in sync.
