@@ -46,20 +46,25 @@ export default function AuthPage({ onAuth, resolved, onToggleTheme }) {
 
   return (
     <div className="auth-wrap">
+      <span className="auth-petal-1 fx-sway">🌷</span>
+      <span className="auth-petal-2 fx-float">🌸</span>
+      <span className="auth-petal-3 fx-float">🦋</span>
       <button className="auth-theme" onClick={onToggleTheme} aria-label="Temayı değiştir">
-        <span className="theme-knob" style={{ left: resolved === 'dark' ? '24px' : '2px' }} />
+        <span className="theme-knob" style={{ left: resolved === 'dark' ? '24px' : '2px' }}>
+          {resolved === 'dark' ? '🌙' : '🌸'}
+        </span>
       </button>
 
       <div className="auth-card">
         <div className="auth-brand">
-          <span className="brand-dot" />
-          <span className="brand-name">Kitaplık</span>
+          <span className="brand-emoji fx-sway">🌷</span>
+          <span className="brand-name">Zeliş'in Kütüphanesi</span>
         </div>
-        <h1 className="auth-title">{isRegister ? 'Hesap oluştur' : 'Tekrar hoş geldin'}</h1>
+        <h1 className="auth-title">{isRegister ? 'Hesap oluştur 🌸' : 'Tekrar hoş geldin 🌸'}</h1>
         <p className="auth-sub">
           {isRegister
-            ? 'Kişisel kütüphaneni oluşturmak için bir kullanıcı adı seç.'
-            : 'Kütüphanene erişmek için giriş yap.'}
+            ? 'Kişisel çiçekli kütüphaneni oluşturmak için bir kullanıcı adı seç.'
+            : 'Çiçekli rafına erişmek için giriş yap.'}
         </p>
 
         <form onSubmit={onSubmit} className="auth-form" noValidate>

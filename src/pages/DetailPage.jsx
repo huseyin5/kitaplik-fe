@@ -21,6 +21,7 @@ export default function DetailPage({ book, status, loading, onBack, onAdd }) {
           ) : (
             <>
               <div className="book-spine" style={{ background: spineColor(book) }} />
+              <span className="cover-flower">🌷</span>
               <div className="detail-cover-title">{book.title}</div>
               <div className="detail-cover-author">{(book.authors || []).join(', ')}</div>
             </>
@@ -41,11 +42,11 @@ export default function DetailPage({ book, status, loading, onBack, onAdd }) {
             {meta ? (
               <div className="detail-status">
                 <span className={`pill ${meta.className}`}><span className="dot" />{meta.label}</span>
-                <span className="note">Kütüphanende</span>
+                <span className="note">Rafında 🌷</span>
               </div>
             ) : (
               <button className="btn-add-lg" onClick={() => onAdd(book)}>
-                <span className="plus">+</span>Kütüphaneme ekle
+                <span className="flower">🌸</span>Kütüphaneme ekle
               </button>
             )}
           </div>

@@ -41,7 +41,8 @@ export default function BookCover({ book, status, onOpen, marginTopTitle }) {
       ) : (
         <>
           <div className="book-spine" style={{ background: spineColor(book) }} />
-          <div className="book-cover-title" style={marginTopTitle ? { marginTop: 20 } : undefined}>{book.title}</div>
+          {!meta && <span className="cover-flower">🌷</span>}
+          <div className="book-cover-title" style={marginTopTitle ? { marginTop: 18 } : undefined}>{book.title}</div>
           <div className="book-cover-author">{(book.authors || []).join(', ')}</div>
         </>
       )}

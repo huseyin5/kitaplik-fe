@@ -20,10 +20,15 @@ export default function SearchPage({
 }) {
   return (
     <section>
-      <h1 className="page-title">Kitap Ara</h1>
-      <p className="page-sub">Başlık veya yazara göre ara, beğendiğini kütüphanene ekle.</p>
+      <div className="search-hero">
+        <span className="hero-petal-1 fx-sway">🌸</span>
+        <span className="hero-petal-2 fx-float">🌿</span>
+        <span className="hero-petal-3">🌷</span>
+        <h1>Zeliş'in Kütüphanesine Hoş geldin! 🌸</h1>
+        <p>Başlık veya yazara göre ara, sevdiğin kitapları çiçekli rafına ekle.</p>
+      </div>
 
-      <div className="search-row">
+      <div className="search-col">
         <div className="search-input-wrap">
           <span className="search-icon"><SearchIcon /></span>
           <input
@@ -35,11 +40,13 @@ export default function SearchPage({
             aria-label="Kitap ara"
           />
         </div>
-        <div className="seg" role="tablist" aria-label="Arama türü">
-          <button className={`seg-btn${by === 'title' ? ' active' : ''}`} onClick={() => onSetBy('title')}>Başlık</button>
-          <button className={`seg-btn${by === 'author' ? ' active' : ''}`} onClick={() => onSetBy('author')}>Yazar</button>
+        <div className="search-controls">
+          <div className="seg" role="tablist" aria-label="Arama türü">
+            <button className={`seg-btn${by === 'title' ? ' active' : ''}`} onClick={() => onSetBy('title')}>Başlık</button>
+            <button className={`seg-btn${by === 'author' ? ' active' : ''}`} onClick={() => onSetBy('author')}>Yazar</button>
+          </div>
+          <button className="btn-primary" onClick={onSearch}>Ara</button>
         </div>
-        <button className="btn-primary" onClick={onSearch}>Ara</button>
       </div>
 
       {loading ? (
@@ -48,17 +55,17 @@ export default function SearchPage({
           <div className="grid-books">
             {SKELETONS.map((n) => (
               <div className="book" key={n}>
-                <div className="sk" style={{ aspectRatio: '3/4', borderRadius: 11 }} />
+                <div className="sk" style={{ aspectRatio: '3/4', borderRadius: 14 }} />
                 <div className="sk" style={{ height: 13, width: '82%' }} />
                 <div className="sk" style={{ height: 11, width: '55%' }} />
-                <div className="sk" style={{ height: 32, borderRadius: 8 }} />
+                <div className="sk" style={{ height: 36, borderRadius: 999 }} />
               </div>
             ))}
           </div>
         </>
       ) : error ? (
         <div className="empty search">
-          <div className="empty-icon"><SearchIcon size={24} /></div>
+          <div className="empty-emoji">🥀</div>
           <div className="empty-title">Arama yapılamadı</div>
           <div className="empty-msg">{error}</div>
           <button className="btn-ghost" onClick={onSearch}>Tekrar dene</button>
@@ -91,7 +98,7 @@ export default function SearchPage({
           </div>
         ) : (
           <div className="empty search">
-            <div className="empty-icon"><SearchIcon size={24} /></div>
+            <div className="empty-emoji">🌷</div>
             <div className="empty-title">Aramaya başla</div>
             <div className="empty-msg">Bir kitap adı veya yazar yazmaya başla; sonuçlar sen yazdıkça burada listelenecek.</div>
           </div>
@@ -114,7 +121,7 @@ export default function SearchPage({
                     <span className={`badge ${meta.className}`}><span className="dot" />{meta.label}</span>
                   ) : (
                     <button className="btn-add" onClick={() => onAdd(book)}>
-                      <span className="plus">+</span>Kütüphaneme ekle
+                      <span className="flower">🌸</span>Ekle
                     </button>
                   )}
                 </div>
@@ -124,7 +131,7 @@ export default function SearchPage({
         </>
       ) : (
         <div className="empty search">
-          <div className="empty-icon"><SearchIcon size={24} /></div>
+          <div className="empty-emoji">🌺</div>
           <div className="empty-title">Sonuç bulunamadı</div>
           <div className="empty-msg">“{query}” için kitap bulunamadı. Farklı bir arama dene veya arama türünü değiştir.</div>
         </div>

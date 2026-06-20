@@ -1,5 +1,4 @@
 import BookCover from '../components/BookCover.jsx'
-import { LibraryIcon } from '../components/icons.jsx'
 import { STATUS_META, STATUS_ORDER } from '../data/books.js'
 
 const FILTERS = [
@@ -10,10 +9,10 @@ const FILTERS = [
 ]
 
 const EMPTY_COPY = {
-  all: { title: 'Kütüphanen henüz boş', msg: 'Arama sayfasından kitap bulup “Kütüphaneme ekle” diyerek listeni oluşturmaya başla.' },
-  okunacak: { title: 'Okunacak kitap yok', msg: 'Eklediğin kitaplar varsayılan olarak burada listelenir.' },
-  okunuyor: { title: 'Şu an okuduğun kitap yok', msg: 'Bir kitabın durumunu “Okunuyor” yaparak buraya taşıyabilirsin.' },
-  okundu: { title: 'Henüz bitirdiğin kitap yok', msg: 'Okumayı tamamladığın kitaplar burada birikecek.' },
+  all: { emoji: '🌱', title: 'Rafın henüz boş', msg: 'Arama sayfasından kitap bulup “Kütüphaneme ekle” diyerek rafını oluşturmaya başla.' },
+  okunacak: { emoji: '🌷', title: 'Okunacak kitap yok', msg: 'Eklediğin kitaplar varsayılan olarak burada listelenir.' },
+  okunuyor: { emoji: '📖', title: 'Şu an okuduğun kitap yok', msg: 'Bir kitabın durumunu “Okunuyor” yaparak buraya taşıyabilirsin.' },
+  okundu: { emoji: '🌸', title: 'Henüz bitirdiğin kitap yok', msg: 'Okumayı tamamladığın kitaplar burada birikecek.' },
 }
 
 const SKELETONS = [1, 2, 3, 4]
@@ -25,7 +24,7 @@ export default function LibraryPage({
   const empty = EMPTY_COPY[filter] || EMPTY_COPY.all
   return (
     <section>
-      <h1 className="page-title" style={{ marginBottom: 16 }}>Kütüphanem</h1>
+      <h1 className="page-title">Zeliş'in Rafı <span className="title-flower">🌸</span></h1>
       <div className="chips">
         {FILTERS.map((f) => (
           <button
@@ -42,25 +41,25 @@ export default function LibraryPage({
         <div className="grid-books">
           {SKELETONS.map((n) => (
             <div className="book" key={n}>
-              <div className="sk" style={{ aspectRatio: '3/4', borderRadius: 11 }} />
+              <div className="sk" style={{ aspectRatio: '3/4', borderRadius: 14 }} />
               <div className="sk" style={{ height: 12, width: '60%' }} />
-              <div className="sk" style={{ height: 34, borderRadius: 8 }} />
+              <div className="sk" style={{ height: 40, borderRadius: 10 }} />
             </div>
           ))}
         </div>
       ) : error ? (
         <div className="empty">
-          <div className="empty-icon"><LibraryIcon size={24} /></div>
+          <div className="empty-emoji">🥀</div>
           <div className="empty-title">Kütüphane yüklenemedi</div>
           <div className="empty-msg">{error}</div>
           <button className="btn-ghost" onClick={onRetry}>Tekrar dene</button>
         </div>
       ) : items.length === 0 ? (
         <div className="empty">
-          <div className="empty-icon"><LibraryIcon size={24} /></div>
+          <div className="empty-emoji">{empty.emoji}</div>
           <div className="empty-title">{empty.title}</div>
           <div className="empty-msg">{empty.msg}</div>
-          <button className="btn-ghost" onClick={onGoSearch}>Kitap ara</button>
+          <button className="btn-ghost" onClick={onGoSearch}>Kitap ara 🌸</button>
         </div>
       ) : (
         <div className="grid-books">

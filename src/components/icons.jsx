@@ -9,9 +9,8 @@ export function SearchIcon({ size = 18 }) {
 
 export function LibraryIcon({ size = 22 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <rect x="4" y="4" width="16" height="16" rx="2" />
-      <line x1="4" y1="9" x2="20" y2="9" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 4h11a2 2 0 0 1 2 2v14l-4-2.2L10 20l-3.5-2.2L5 20V4z" />
     </svg>
   )
 }
