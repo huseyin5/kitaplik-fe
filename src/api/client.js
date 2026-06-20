@@ -3,13 +3,23 @@
 // In development, requests use same-origin relative paths and Vite proxies
 // /api + /health to the backend (see vite.config.js). In production, set
 // VITE_API_BASE_URL to the API origin, e.g. https://api.example.com
+import { loadAuth } from '../auth/storage.js'
+
 const BASE = import.meta.env.VITE_API_BASE_URL || ''
+
+// Bearer token attached to every request. Initialised from storage so a
+// reloaded page is authenticated before the first call; App keeps it in sync.
+let authToken = loadAuth()?.token || null
+export function setAuthToken(token) {
+  authToken = token || null
+}
 
 async function request(path, options = {}) {
   const res = await fetch(BASE + path, {
     ...options,
     headers: {
       ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       ...options.headers,
     },
   })
@@ -61,6 +71,14 @@ export function updateLibraryStatus(id, status) {
 
 export function deleteLibraryBook(id) {
   return request(`/api/library/${id}`, { method: 'DELETE' })
+}
+
+export function register(username, password) {
+  return request('/api/auth/register', { method: 'POST', body: JSON.stringify({ username, password }) })
+}
+
+export function login(username, password) {
+  return request('/api/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) })
 }
 
 export function getHealth() {

@@ -1,6 +1,7 @@
 import ThemeToggle from './ThemeToggle.jsx'
 
-export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, activeNav }) {
+export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, activeNav, username, onLogout }) {
+  const initial = (username || '?').charAt(0)
   return (
     <>
       <header className="topbar show-desktop">
@@ -14,7 +15,11 @@ export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, a
             <button className={`nav-btn${activeNav === 'library' ? ' active' : ''}`} onClick={onLibrary}>Kütüphanem</button>
           </nav>
         </div>
-        <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
+        <div className="header-user">
+          <span className="user-chip"><span className="user-avatar">{initial}</span>{username}</span>
+          <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
+          <button className="logout-btn" onClick={onLogout}>Çıkış</button>
+        </div>
       </header>
 
       <header className="topbar show-mobile">
@@ -22,7 +27,11 @@ export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, a
           <span className="brand-dot" />
           <span className="brand-name">Kitaplık</span>
         </div>
-        <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
+        <div className="header-user">
+          <span className="user-avatar">{initial}</span>
+          <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
+          <button className="logout-btn" onClick={onLogout}>Çıkış</button>
+        </div>
       </header>
     </>
   )

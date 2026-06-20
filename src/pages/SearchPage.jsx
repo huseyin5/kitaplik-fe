@@ -4,8 +4,18 @@ import { STATUS_META } from '../data/books.js'
 
 const SKELETONS = [1, 2, 3, 4, 5, 6, 7, 8]
 
+function ClockIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  )
+}
+
 export default function SearchPage({
   query, by, loading, error, hasSearched, results, findEntry,
+  history, onPickHistory, onRemoveHistory, onClearHistory,
   onQueryChange, onSearch, onSetBy, onOpen, onAdd,
 }) {
   return (
@@ -54,11 +64,38 @@ export default function SearchPage({
           <button className="btn-ghost" onClick={onSearch}>Tekrar dene</button>
         </div>
       ) : !hasSearched ? (
-        <div className="empty search">
-          <div className="empty-icon"><SearchIcon size={24} /></div>
-          <div className="empty-title">Aramaya başla</div>
-          <div className="empty-msg">Bir kitap adı veya yazar yazıp “Ara” de; sonuçlar burada listelenecek.</div>
-        </div>
+        history && history.length > 0 ? (
+          <div className="history">
+            <div className="history-head">
+              <span className="history-title">Son aramalar</span>
+              <button className="history-clear" onClick={onClearHistory}>Temizle</button>
+            </div>
+            <div className="history-list">
+              {history.map((term) => (
+                <span className="history-chip" key={term}>
+                  <button
+                    className="history-chip-main"
+                    onClick={() => onPickHistory(term)}
+                    style={{ border: 'none', background: 'none', color: 'inherit', font: 'inherit', display: 'inline-flex', alignItems: 'center', gap: 8, padding: 0 }}
+                  >
+                    <span className="clock"><ClockIcon /></span>{term}
+                  </button>
+                  <button
+                    className="history-remove"
+                    aria-label={`${term} aramasını geçmişten kaldır`}
+                    onClick={() => onRemoveHistory(term)}
+                  >×</button>
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="empty search">
+            <div className="empty-icon"><SearchIcon size={24} /></div>
+            <div className="empty-title">Aramaya başla</div>
+            <div className="empty-msg">Bir kitap adı veya yazar yazmaya başla; sonuçlar sen yazdıkça burada listelenecek.</div>
+          </div>
+        )
       ) : results.length > 0 ? (
         <>
           <div className="result-count">{results.length} sonuç</div>

@@ -5,8 +5,11 @@ import Toast from './components/Toast.jsx'
 import SearchPage from './pages/SearchPage.jsx'
 import DetailPage from './pages/DetailPage.jsx'
 import LibraryPage from './pages/LibraryPage.jsx'
+import AuthPage from './pages/AuthPage.jsx'
 import { useTheme } from './hooks/useTheme.js'
+import { useSearchHistory } from './hooks/useSearchHistory.js'
 import { sameBook } from './utils/book.js'
+import { loadAuth, saveAuth, clearAuth } from './auth/storage.js'
 import {
   searchBooks,
   getBookDetail,
@@ -14,6 +17,7 @@ import {
   addLibraryBook,
   updateLibraryStatus,
   deleteLibraryBook,
+  setAuthToken,
 } from './api/client.js'
 
 // Fields the backend accepts when adding a book to the library (AddLibraryBook).
@@ -34,7 +38,9 @@ function toAddPayload(book, status) {
 
 export default function App() {
   const { resolved, toggle } = useTheme()
+  const { history, add: addHistory, remove: removeHistory, clear: clearHistory } = useSearchHistory()
 
+  const [auth, setAuth] = useState(loadAuth)
   const [route, setRoute] = useState('search')
   const [selectedFrom, setSelectedFrom] = useState('search')
   const [toast, setToast] = useState(null)
@@ -72,6 +78,34 @@ export default function App() {
     toastTimer.current = setTimeout(() => setToast(null), 2400)
   }, [])
 
+  // ---- Auth ----
+  const logout = useCallback(() => {
+    setAuthToken(null)
+    clearAuth()
+    setAuth(null)
+    setLibrary([])
+    setRoute('search')
+    setSelectedBook(null)
+    setSearchResults([])
+    setHasSearched(false)
+    setQuery('')
+  }, [])
+
+  // Expired/invalid session → drop back to the login screen.
+  const handleAuthError = useCallback((e) => {
+    if (e && e.status === 401) {
+      logout()
+      return true
+    }
+    return false
+  }, [logout])
+
+  const handleAuth = useCallback((result) => {
+    setAuthToken(result.token)
+    saveAuth(result)
+    setAuth(result)
+  }, [])
+
   // ---- Library loading ----
   const refreshLibrary = useCallback(async () => {
     setLibLoading(true)
@@ -80,21 +114,25 @@ export default function App() {
       const data = await getLibrary()
       setLibrary(data?.books || [])
     } catch (e) {
+      if (handleAuthError(e)) return
       setLibError(e.message)
     } finally {
       setLibLoading(false)
     }
-  }, [])
+  }, [handleAuthError])
 
-  useEffect(() => { refreshLibrary() }, [refreshLibrary])
+  // Load the library after sign-in (and refetch when the user changes).
+  useEffect(() => { if (auth) refreshLibrary() }, [auth, refreshLibrary])
 
   const findEntry = useCallback((book) => library.find((l) => sameBook(l, book)) || null, [library])
 
   // ---- Search ----
-  const doSearch = useCallback(async () => {
-    const q = query.trim()
+  // Searches need at least 2 characters; shorter input resets to the idle state.
+  const runSearch = useCallback(async (rawQuery, searchBy) => {
+    const q = (rawQuery || '').trim()
     if (searchAbort.current) searchAbort.current.abort()
-    if (!q) {
+    if (q.length < 2) {
+      searchAbort.current = null
       setSearchResults([])
       setHasSearched(false)
       setSearchError(null)
@@ -107,7 +145,8 @@ export default function App() {
     setSearchError(null)
     setHasSearched(true)
     try {
-      const data = await searchBooks({ q, by, limit: 20, signal: controller.signal })
+      const data = await searchBooks({ q, by: searchBy, limit: 20, signal: controller.signal })
+      if (controller.signal.aborted) return
       setSearchResults(data?.results || [])
     } catch (e) {
       if (e.name === 'AbortError') return
@@ -119,7 +158,24 @@ export default function App() {
         setSearchLoading(false)
       }
     }
-  }, [query, by])
+  }, [])
+
+  // Search-as-you-type: debounce input/filter changes before hitting the API.
+  useEffect(() => {
+    const id = setTimeout(() => { runSearch(query, by) }, 350)
+    return () => clearTimeout(id)
+  }, [query, by, runSearch])
+
+  // Immediate search for the "Ara" button / Enter key; records the term.
+  const submitSearch = useCallback(() => {
+    runSearch(query, by)
+    addHistory(query)
+  }, [query, by, runSearch, addHistory])
+
+  const pickHistory = useCallback((term) => {
+    setQuery(term)
+    addHistory(term)
+  }, [addHistory])
 
   // ---- Mutations ----
   const addToLibrary = useCallback(async (book) => {
@@ -132,9 +188,10 @@ export default function App() {
       setLibrary((prev) => [created, ...prev])
       showToast('“' + book.title + '” kütüphanene eklendi')
     } catch (e) {
+      if (handleAuthError(e)) return
       showToast(e.message)
     }
-  }, [findEntry, showToast])
+  }, [findEntry, showToast, handleAuthError])
 
   const setStatus = useCallback(async (id, status) => {
     const previous = library
@@ -144,9 +201,10 @@ export default function App() {
       setLibrary((prev) => prev.map((l) => (l.id === id ? updated : l)))
     } catch (e) {
       setLibrary(previous)
+      if (handleAuthError(e)) return
       showToast(e.message)
     }
-  }, [library, showToast])
+  }, [library, showToast, handleAuthError])
 
   const removeFromLibrary = useCallback(async (id) => {
     const previous = library
@@ -156,9 +214,10 @@ export default function App() {
       showToast('Kitap kütüphanenden kaldırıldı')
     } catch (e) {
       setLibrary(previous)
+      if (handleAuthError(e)) return
       showToast(e.message)
     }
-  }, [library, showToast])
+  }, [library, showToast, handleAuthError])
 
   // ---- Navigation ----
   const goSearch = useCallback(() => setRoute('search'), [])
@@ -200,6 +259,15 @@ export default function App() {
   const onLibrarySide = route === 'library' || (route === 'detail' && selectedFrom === 'library')
   const activeNav = onLibrarySide ? 'library' : 'search'
 
+  // Not signed in → show the auth screen (all hooks above still run, per rules).
+  if (!auth) {
+    return (
+      <div className="app" data-theme={resolved}>
+        <AuthPage onAuth={handleAuth} resolved={resolved} onToggleTheme={toggle} />
+      </div>
+    )
+  }
+
   return (
     <div className="app" data-theme={resolved}>
       <Toast message={toast?.msg} />
@@ -210,6 +278,8 @@ export default function App() {
         onToggleTheme={toggle}
         onSearch={goSearch}
         onLibrary={goLibrary}
+        username={auth.user?.username}
+        onLogout={logout}
       />
 
       <main className="main-pad">
@@ -223,10 +293,14 @@ export default function App() {
               hasSearched={hasSearched}
               results={searchResults}
               findEntry={findEntry}
+              history={history}
+              onPickHistory={pickHistory}
+              onRemoveHistory={removeHistory}
+              onClearHistory={clearHistory}
               onQueryChange={setQuery}
-              onSearch={doSearch}
+              onSearch={submitSearch}
               onSetBy={setBy}
-              onOpen={(book) => openBook(book, 'search')}
+              onOpen={(book) => { addHistory(query); openBook(book, 'search') }}
               onAdd={addToLibrary}
             />
           )}

@@ -1,18 +1,23 @@
+import { useEffect, useState } from 'react'
 import { STATUS_META } from '../data/books.js'
 import { spineColor } from '../utils/book.js'
 
 const dash = (v) => (v == null || v === '' ? '—' : v)
 
 export default function DetailPage({ book, status, loading, onBack, onAdd }) {
+  const [imgFailed, setImgFailed] = useState(false)
+  useEffect(() => { setImgFailed(false) }, [book?.coverUrl])
+
   if (!book) return null
   const meta = status ? STATUS_META[status] : null
+  const showImage = book.coverUrl && !imgFailed
   return (
     <section>
       <button className="back-btn" onClick={onBack}><span className="chev">‹</span>Geri</button>
       <div className="detail-row">
         <div className="detail-cover">
-          {book.coverUrl ? (
-            <img className="book-cover-img" src={book.coverUrl} alt="" />
+          {showImage ? (
+            <img className="book-cover-img" src={book.coverUrl} alt="" onError={() => setImgFailed(true)} />
           ) : (
             <>
               <div className="book-spine" style={{ background: spineColor(book) }} />
