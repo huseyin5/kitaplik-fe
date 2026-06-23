@@ -1,6 +1,6 @@
-import BookCover from '../components/BookCover.jsx'
 import { SearchIcon } from '../components/icons.jsx'
 import { STATUS_META } from '../data/books.js'
+import { spineColor } from '../utils/book.js'
 
 const SKELETONS = [1, 2, 3, 4, 5, 6, 7, 8]
 
@@ -44,10 +44,13 @@ export default function SearchPage({
           <div className="grid-books">
             {SKELETONS.map((n) => (
               <div className="book" key={n}>
-                <div className="sk" style={{ aspectRatio: '3/4', borderRadius: 14 }} />
-                <div className="sk" style={{ height: 13, width: '82%' }} />
-                <div className="sk" style={{ height: 11, width: '55%' }} />
-                <div className="sk" style={{ height: 36, borderRadius: 999 }} />
+                <div className="book-main">
+                  <div className="sk" style={{ height: 15, width: '85%' }} />
+                  <div className="sk" style={{ height: 12, width: '55%' }} />
+                </div>
+                <div className="book-foot">
+                  <div className="sk" style={{ height: 38, borderRadius: 999 }} />
+                </div>
               </div>
             ))}
           </div>
@@ -101,16 +104,17 @@ export default function SearchPage({
               const meta = entry ? STATUS_META[entry.status] : null
               return (
                 <div className="book" key={`${book.source}:${book.id}`}>
-                  <BookCover book={book} status={null} onOpen={() => onOpen(book)} />
-                  <div className="book-info">
-                    <div className="book-info-title">{book.title}</div>
-                    <div className="book-info-meta">{(book.authors || []).join(', ')}{book.publishedDate ? ` · ${book.publishedDate}` : ''}</div>
+                  <button className="book-main" onClick={() => onOpen(book)} style={{ borderLeftColor: spineColor(book) }}>
+                    <div className="book-title">{book.title}</div>
+                    <div className="book-meta">{(book.authors || []).join(', ')}{book.publishedDate ? ` · ${book.publishedDate}` : ''}</div>
+                  </button>
+                  <div className="book-foot">
+                    {meta ? (
+                      <span className={`badge ${meta.className}`}><span className="dot" />{meta.label}</span>
+                    ) : (
+                      <button className="btn-add" onClick={() => onAdd(book)}>Ekle</button>
+                    )}
                   </div>
-                  {meta ? (
-                    <span className={`badge ${meta.className}`}><span className="dot" />{meta.label}</span>
-                  ) : (
-                    <button className="btn-add" onClick={() => onAdd(book)}>Ekle</button>
-                  )}
                 </div>
               )
             })}

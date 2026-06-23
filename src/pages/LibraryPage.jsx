@@ -1,5 +1,5 @@
-import BookCover from '../components/BookCover.jsx'
 import { STATUS_META, STATUS_ORDER } from '../data/books.js'
+import { spineColor } from '../utils/book.js'
 
 const FILTERS = [
   { key: 'all', label: 'Tümü' },
@@ -41,9 +41,13 @@ export default function LibraryPage({
         <div className="grid-books">
           {SKELETONS.map((n) => (
             <div className="book" key={n}>
-              <div className="sk" style={{ aspectRatio: '3/4', borderRadius: 14 }} />
-              <div className="sk" style={{ height: 12, width: '60%' }} />
-              <div className="sk" style={{ height: 40, borderRadius: 10 }} />
+              <div className="book-main">
+                <div className="sk" style={{ height: 15, width: '80%' }} />
+                <div className="sk" style={{ height: 12, width: '55%' }} />
+              </div>
+              <div className="book-foot">
+                <div className="sk" style={{ height: 40, borderRadius: 10 }} />
+              </div>
             </div>
           ))}
         </div>
@@ -63,25 +67,31 @@ export default function LibraryPage({
         </div>
       ) : (
         <div className="grid-books">
-          {items.map((item) => (
-            <div className="book" key={item.id}>
-              <BookCover book={item} status={item.status} onOpen={() => onOpen(item)} marginTopTitle />
-              <div className="book-meta-line">{(item.authors || []).join(', ')}{item.publishedDate ? ` · ${item.publishedDate}` : ''}</div>
-              <div className="lib-controls">
-                <select
-                  className="lib-select"
-                  value={item.status}
-                  onChange={(e) => onStatusChange(item.id, e.target.value)}
-                  aria-label="Durumu değiştir"
-                >
-                  {STATUS_ORDER.map((s) => (
-                    <option key={s} value={s}>{STATUS_META[s].label}</option>
-                  ))}
-                </select>
-                <button className="btn-remove" onClick={() => onRemove(item.id)} aria-label="Kütüphaneden sil">Sil</button>
+          {items.map((item) => {
+            const meta = STATUS_META[item.status]
+            return (
+              <div className="book" key={item.id}>
+                <button className="book-main" onClick={() => onOpen(item)} style={{ borderLeftColor: spineColor(item) }}>
+                  <div className="book-title">{item.title}</div>
+                  <div className="book-meta">{(item.authors || []).join(', ')}{item.publishedDate ? ` · ${item.publishedDate}` : ''}</div>
+                  {meta && <span className={`badge ${meta.className}`}><span className="dot" />{meta.label}</span>}
+                </button>
+                <div className="book-foot lib-controls">
+                  <select
+                    className="lib-select"
+                    value={item.status}
+                    onChange={(e) => onStatusChange(item.id, e.target.value)}
+                    aria-label="Durumu değiştir"
+                  >
+                    {STATUS_ORDER.map((s) => (
+                      <option key={s} value={s}>{STATUS_META[s].label}</option>
+                    ))}
+                  </select>
+                  <button className="btn-remove" onClick={() => onRemove(item.id)} aria-label="Kütüphaneden sil">Sil</button>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </section>
