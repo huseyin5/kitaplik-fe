@@ -1,3 +1,5 @@
+import { useMemo, useState } from 'react'
+import { SearchIcon } from '../components/icons.jsx'
 import { STATUS_META, STATUS_ORDER } from '../data/books.js'
 import { spineColor } from '../utils/book.js'
 
@@ -21,10 +23,35 @@ export default function LibraryPage({
   filter, counts, items, loading, error, onRetry,
   onSetFilter, onOpen, onStatusChange, onRemove, onGoSearch,
 }) {
+  const [q, setQ] = useState('')
+
+  // Filter the (already status-filtered) list by title/author locally.
+  const visible = useMemo(() => {
+    const term = q.trim().toLocaleLowerCase('tr')
+    if (!term) return items
+    return items.filter((b) =>
+      b.title.toLocaleLowerCase('tr').includes(term) ||
+      (b.authors || []).join(', ').toLocaleLowerCase('tr').includes(term))
+  }, [items, q])
+
   const empty = EMPTY_COPY[filter] || EMPTY_COPY.all
   return (
     <section>
       <h1 className="page-title">Kütüphanem</h1>
+
+      <div className="search-row">
+        <div className="search-input-wrap">
+          <span className="search-icon"><SearchIcon /></span>
+          <input
+            className="search-input"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Kütüphanende ara…"
+            aria-label="Kütüphanende ara"
+          />
+        </div>
+      </div>
+
       <div className="chips">
         {FILTERS.map((f) => (
           <button
@@ -65,9 +92,15 @@ export default function LibraryPage({
           <div className="empty-msg">{empty.msg}</div>
           <button className="btn-ghost" onClick={onGoSearch}>Kitap ara</button>
         </div>
+      ) : visible.length === 0 ? (
+        <div className="empty">
+          <div className="empty-emoji">🔍</div>
+          <div className="empty-title">Sonuç bulunamadı</div>
+          <div className="empty-msg">“{q}” için kütüphanende kitap bulunamadı.</div>
+        </div>
       ) : (
         <div className="grid-books">
-          {items.map((item) => {
+          {visible.map((item) => {
             const meta = STATUS_META[item.status]
             return (
               <div className="book" key={item.id}>
