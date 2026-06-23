@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react'
 import { STATUS_META } from '../data/books.js'
 import { spineColor } from '../utils/book.js'
 
-// The clickable cover shared by search results and library items. Shows the
-// real cover image when the backend provides one AND it loads successfully;
-// otherwise falls back to a spine + title placeholder coloured deterministically
-// from the book's identity (covers both missing and broken/404 image URLs).
+// The clickable cover shared by search results and library items. Shows a
+// cover image when a book has one (and it loads), otherwise falls back to a
+// spine + title placeholder coloured deterministically from the book's identity.
 export default function BookCover({ book, status, onOpen, marginTopTitle }) {
   const meta = status ? STATUS_META[status] : null
   const [imgFailed, setImgFailed] = useState(false)

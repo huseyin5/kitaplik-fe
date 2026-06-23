@@ -1,5 +1,5 @@
-// The backend does not return a cover/spine colour, so we derive a stable one
-// from the book's identity to keep the placeholder covers visually varied.
+// Books have no cover image, so we derive a stable spine colour from the book's
+// identity to keep the placeholder covers visually varied.
 const SPINE_PALETTE = ['#e85a9b', '#d6457f', '#f06595', '#c2255c', '#e64980', '#d6336c']
 
 export function spineColor(book) {

@@ -1,7 +1,6 @@
 import ThemeToggle from './ThemeToggle.jsx'
 
-export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, activeNav, username, onLogout }) {
-  const initial = (username || '?').charAt(0)
+export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, activeNav }) {
   return (
     <>
       <header className="topbar show-desktop">
@@ -16,9 +15,7 @@ export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, a
           </nav>
         </div>
         <div className="header-user">
-          <span className="user-chip"><span className="user-avatar">{initial}</span>{username}</span>
           <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
-          <button className="logout-btn" onClick={onLogout}>Çıkış</button>
           <span className="header-flutter fx-float">🦋</span>
         </div>
       </header>
@@ -28,11 +25,7 @@ export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, a
           <span className="brand-emoji fx-sway">🌷</span>
           <span className="brand-name">Zeliş'in Kütüphanesi</span>
         </div>
-        <div className="header-user">
-          <span className="user-avatar">{initial}</span>
-          <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
-          <button className="logout-btn" onClick={onLogout}>Çıkış</button>
-        </div>
+        <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
       </header>
     </>
   )

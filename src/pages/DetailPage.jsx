@@ -4,7 +4,7 @@ import { spineColor } from '../utils/book.js'
 
 const dash = (v) => (v == null || v === '' ? '—' : v)
 
-export default function DetailPage({ book, status, loading, onBack, onAdd }) {
+export default function DetailPage({ book, status, onBack, onAdd }) {
   const [imgFailed, setImgFailed] = useState(false)
   useEffect(() => { setImgFailed(false) }, [book?.coverUrl])
 
@@ -52,8 +52,6 @@ export default function DetailPage({ book, status, loading, onBack, onAdd }) {
           </div>
           {book.description ? (
             <p className="detail-desc">{book.description}</p>
-          ) : loading ? (
-            <p className="detail-desc" style={{ color: 'var(--muted)' }}>Açıklama yükleniyor…</p>
           ) : null}
         </div>
       </div>

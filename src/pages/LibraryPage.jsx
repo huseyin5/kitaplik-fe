@@ -15,10 +15,8 @@ const EMPTY_COPY = {
   okundu: { emoji: '🌸', title: 'Henüz bitirdiğin kitap yok', msg: 'Okumayı tamamladığın kitaplar burada birikecek.' },
 }
 
-const SKELETONS = [1, 2, 3, 4]
-
 export default function LibraryPage({
-  filter, counts, items, loading, error, onRetry,
+  filter, counts, items,
   onSetFilter, onOpen, onStatusChange, onRemove, onGoSearch,
 }) {
   const empty = EMPTY_COPY[filter] || EMPTY_COPY.all
@@ -37,24 +35,7 @@ export default function LibraryPage({
         ))}
       </div>
 
-      {loading ? (
-        <div className="grid-books">
-          {SKELETONS.map((n) => (
-            <div className="book" key={n}>
-              <div className="sk" style={{ aspectRatio: '3/4', borderRadius: 14 }} />
-              <div className="sk" style={{ height: 12, width: '60%' }} />
-              <div className="sk" style={{ height: 40, borderRadius: 10 }} />
-            </div>
-          ))}
-        </div>
-      ) : error ? (
-        <div className="empty">
-          <div className="empty-emoji">🥀</div>
-          <div className="empty-title">Kütüphane yüklenemedi</div>
-          <div className="empty-msg">{error}</div>
-          <button className="btn-ghost" onClick={onRetry}>Tekrar dene</button>
-        </div>
-      ) : items.length === 0 ? (
+      {items.length === 0 ? (
         <div className="empty">
           <div className="empty-emoji">{empty.emoji}</div>
           <div className="empty-title">{empty.title}</div>

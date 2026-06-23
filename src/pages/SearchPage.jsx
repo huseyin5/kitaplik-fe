@@ -2,8 +2,6 @@ import BookCover from '../components/BookCover.jsx'
 import { SearchIcon } from '../components/icons.jsx'
 import { STATUS_META } from '../data/books.js'
 
-const SKELETONS = [1, 2, 3, 4, 5, 6, 7, 8]
-
 function ClockIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -14,7 +12,7 @@ function ClockIcon() {
 }
 
 export default function SearchPage({
-  query, by, loading, error, hasSearched, results, findEntry,
+  query, by, hasSearched, results, findEntry,
   history, onPickHistory, onRemoveHistory, onClearHistory,
   onQueryChange, onSearch, onSetBy, onOpen, onAdd,
 }) {
@@ -49,28 +47,7 @@ export default function SearchPage({
         </div>
       </div>
 
-      {loading ? (
-        <>
-          <div className="result-count">Aranıyor…</div>
-          <div className="grid-books">
-            {SKELETONS.map((n) => (
-              <div className="book" key={n}>
-                <div className="sk" style={{ aspectRatio: '3/4', borderRadius: 14 }} />
-                <div className="sk" style={{ height: 13, width: '82%' }} />
-                <div className="sk" style={{ height: 11, width: '55%' }} />
-                <div className="sk" style={{ height: 36, borderRadius: 999 }} />
-              </div>
-            ))}
-          </div>
-        </>
-      ) : error ? (
-        <div className="empty search">
-          <div className="empty-emoji">🥀</div>
-          <div className="empty-title">Arama yapılamadı</div>
-          <div className="empty-msg">{error}</div>
-          <button className="btn-ghost" onClick={onSearch}>Tekrar dene</button>
-        </div>
-      ) : !hasSearched ? (
+      {!hasSearched ? (
         history && history.length > 0 ? (
           <div className="history">
             <div className="history-head">
@@ -111,7 +88,7 @@ export default function SearchPage({
               const entry = findEntry(book)
               const meta = entry ? STATUS_META[entry.status] : null
               return (
-                <div className="book" key={`${book.source}:${book.id}`}>
+                <div className="book" key={book.id}>
                   <BookCover book={book} status={null} onOpen={() => onOpen(book)} />
                   <div className="book-info">
                     <div className="book-info-title">{book.title}</div>
