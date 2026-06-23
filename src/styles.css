@@ -1,5 +1,7 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; background: var(--page); -webkit-text-size-adjust: 100%; }
+:root { color-scheme: light; }
+[data-theme="dark"] { color-scheme: dark; }
 
 :root {
   --page: #fff5f9; --card: #ffffff; --text: #4a2540; --muted: #a8769a; --border: #fbdfeb; --hover: #fdeaf3;
@@ -184,7 +186,7 @@ input, select, button { font-family: inherit; }
 .search-input-wrap { position: relative; display: flex; align-items: center; flex: 1; min-width: 0; }
 .search-icon { position: absolute; left: 14px; display: flex; color: var(--muted); pointer-events: none; }
 .search-input {
-  width: 100%; padding: 13px 14px 13px 42px; font-size: 15px;
+  width: 100%; padding: 13px 14px 13px 42px; font-size: 16px;
   border: 1px solid var(--glass-border); border-radius: 999px; color: var(--text);
   background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
   box-shadow: var(--glass-hi);
@@ -253,7 +255,7 @@ input, select, button { font-family: inherit; }
 
 .lib-controls { display: flex; gap: 7px; align-items: center; }
 .lib-select {
-  flex: 1; min-width: 0; padding: 10px 8px; font-size: 12px; font-weight: 600;
+  flex: 1; min-width: 0; padding: 10px 8px; font-size: 16px; font-weight: 600;
   border: 1px solid var(--glass-border); border-radius: 10px; color: var(--text); min-height: 40px;
   background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
 }

@@ -36,6 +36,12 @@ export default function App() {
   const { resolved, toggle } = useTheme()
   const { history, add: addHistory, remove: removeHistory, clear: clearHistory } = useSearchHistory()
 
+  // Apply the theme on <html> so the whole document (status bar / safe areas /
+  // overscroll) is themed — otherwise the area behind the glass header shows white.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', resolved)
+  }, [resolved])
+
   const [route, setRoute] = useState('search')
   const [selectedFrom, setSelectedFrom] = useState('search')
   const [toast, setToast] = useState(null)
