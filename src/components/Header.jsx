@@ -1,6 +1,21 @@
 import ThemeToggle from './ThemeToggle.jsx'
+import { BellIcon } from './icons.jsx'
 
-export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, activeNav }) {
+export default function Header({
+  onLibrary, resolved, onToggleTheme, onSearch, activeNav,
+  notifySupported, notifyOn, onToggleNotify,
+}) {
+  const bell = notifySupported ? (
+    <button
+      className={`icon-btn${notifyOn ? ' active' : ''}`}
+      onClick={onToggleNotify}
+      aria-label={notifyOn ? 'Bildirimleri kapat' : 'Bildirimleri aç'}
+      title={notifyOn ? 'Bildirimler açık' : 'Bildirimleri aç'}
+    >
+      <BellIcon off={!notifyOn} />
+    </button>
+  ) : null
+
   return (
     <>
       <header className="topbar show-desktop">
@@ -14,7 +29,10 @@ export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, a
             <button className={`nav-btn${activeNav === 'library' ? ' active' : ''}`} onClick={onLibrary}>Kütüphanem</button>
           </nav>
         </div>
-        <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
+        <div className="header-user">
+          {bell}
+          <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
+        </div>
       </header>
 
       <header className="topbar show-mobile">
@@ -22,7 +40,10 @@ export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, a
           <img className="brand-logo" src="/logo.svg" alt="" width="26" height="26" />
           <span className="brand-name">Zeliş'in Kütüphanesi</span>
         </button>
-        <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
+        <div className="header-user">
+          {bell}
+          <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
+        </div>
       </header>
     </>
   )

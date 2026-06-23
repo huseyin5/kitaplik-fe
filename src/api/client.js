@@ -63,3 +63,16 @@ export function updateLibraryStatus(id, status) {
 export function deleteLibraryBook(id) {
   return request(`/api/library/${id}`, { method: 'DELETE' })
 }
+
+// ---- Web push ----
+export function getVapidPublicKey() {
+  return request('/api/push/public-key')
+}
+
+export function subscribePush(subscription) {
+  return request('/api/push/subscribe', { method: 'POST', body: JSON.stringify(subscription) })
+}
+
+export function unsubscribePush(body) {
+  return request('/api/push/unsubscribe', { method: 'POST', body: JSON.stringify(body) })
+}

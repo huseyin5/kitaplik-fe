@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="catbg" cx="50%" cy="40%" r="75%">
+      <stop offset="0%" stop-color="#fff5fa"/>
+      <stop offset="100%" stop-color="#ffd9ea"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#catbg)"/>
+  <!-- ears -->
+  <path d="M150 200 L132 84 L246 162 Z" fill="#fff7fc" stroke="#f3c2db" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M362 200 L380 84 L266 162 Z" fill="#fff7fc" stroke="#f3c2db" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M163 184 L152 116 L214 160 Z" fill="#f48fb1"/>
+  <path d="M349 184 L360 116 L298 160 Z" fill="#f48fb1"/>
+  <!-- head -->
+  <circle cx="256" cy="290" r="150" fill="#fff7fc" stroke="#f3c2db" stroke-width="6"/>
+  <!-- blush -->
+  <ellipse cx="186" cy="312" rx="26" ry="17" fill="#f9a8cd" fill-opacity="0.65"/>
+  <ellipse cx="326" cy="312" rx="26" ry="17" fill="#f9a8cd" fill-opacity="0.65"/>
+  <!-- eyes (happy) -->
+  <path d="M192 286 q22 -22 44 0" fill="none" stroke="#5a2f45" stroke-width="11" stroke-linecap="round"/>
+  <path d="M276 286 q22 -22 44 0" fill="none" stroke="#5a2f45" stroke-width="11" stroke-linecap="round"/>
+  <!-- nose -->
+  <path d="M246 300 L266 300 L256 312 Z" fill="#ec5a98"/>
+  <!-- mouth -->
+  <path d="M256 312 q-14 18 -30 8" fill="none" stroke="#5a2f45" stroke-width="7" stroke-linecap="round"/>
+  <path d="M256 312 q14 18 30 8" fill="none" stroke="#5a2f45" stroke-width="7" stroke-linecap="round"/>
+  <!-- whiskers -->
+  <g stroke="#d9a7c2" stroke-width="6" stroke-linecap="round">
+    <path d="M150 296 L86 286"/>
+    <path d="M150 312 L88 320"/>
+    <path d="M362 296 L426 286"/>
+    <path d="M362 312 L424 320"/>
+  </g>
+</svg>

@@ -2,12 +2,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Header from './components/Header.jsx'
 import BottomNav from './components/BottomNav.jsx'
 import Toast from './components/Toast.jsx'
+import CatPopup from './components/CatPopup.jsx'
 import SearchPage from './pages/SearchPage.jsx'
 import DetailPage from './pages/DetailPage.jsx'
 import LibraryPage from './pages/LibraryPage.jsx'
 import { useTheme } from './hooks/useTheme.js'
 import { useSearchHistory } from './hooks/useSearchHistory.js'
 import { sameBook } from './utils/book.js'
+import {
+  pushSupported, registerServiceWorker, enablePush, disablePush, isPushEnabled,
+} from './notifications.js'
 import {
   searchBooks,
   getBookDetail,
@@ -46,6 +50,11 @@ export default function App() {
   const [selectedFrom, setSelectedFrom] = useState('search')
   const [toast, setToast] = useState(null)
 
+  // Notifications
+  const [notifyOn, setNotifyOn] = useState(false)
+  const [catSlot, setCatSlot] = useState(null)
+  const notifySupported = pushSupported()
+
   // Search state
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
@@ -77,6 +86,46 @@ export default function App() {
     clearTimeout(toastTimer.current)
     toastTimer.current = setTimeout(() => setToast(null), 2400)
   }, [])
+
+  // ---- Notifications: register SW, reflect state, handle notification clicks ----
+  useEffect(() => {
+    if (!notifySupported) return
+    registerServiceWorker().catch(() => {})
+    isPushEnabled().then(setNotifyOn).catch(() => {})
+
+    // Opened via a notification click (?notif=morning|night) → show the cat popup.
+    const params = new URLSearchParams(window.location.search)
+    const slot = params.get('notif')
+    if (slot) {
+      setCatSlot(slot)
+      params.delete('notif')
+      const qs = params.toString()
+      window.history.replaceState({}, '', window.location.pathname + (qs ? `?${qs}` : ''))
+    }
+
+    // App already open and a notification is clicked → SW posts a message.
+    const onMessage = (e) => {
+      if (e.data && e.data.type === 'notif-click') setCatSlot(e.data.slot || 'default')
+    }
+    navigator.serviceWorker.addEventListener('message', onMessage)
+    return () => navigator.serviceWorker.removeEventListener('message', onMessage)
+  }, [notifySupported])
+
+  const toggleNotify = useCallback(async () => {
+    try {
+      if (notifyOn) {
+        await disablePush()
+        setNotifyOn(false)
+        showToast('Bildirimler kapatıldı')
+      } else {
+        await enablePush()
+        setNotifyOn(true)
+        showToast('Bildirimler açıldı 🔔 Her sabah 9, akşam 23’te haber vereceğiz')
+      }
+    } catch (e) {
+      showToast(e.message)
+    }
+  }, [notifyOn, showToast])
 
   // ---- Library loading ----
   const refreshLibrary = useCallback(async () => {
@@ -229,6 +278,7 @@ export default function App() {
   return (
     <div className="app" data-theme={resolved}>
       <Toast message={toast?.msg} />
+      <CatPopup slot={catSlot} onClose={() => setCatSlot(null)} />
 
       <Header
         activeNav={activeNav}
@@ -236,6 +286,9 @@ export default function App() {
         onToggleTheme={toggle}
         onSearch={goSearch}
         onLibrary={goLibrary}
+        notifySupported={notifySupported}
+        notifyOn={notifyOn}
+        onToggleNotify={toggleNotify}
       />
 
       <main className="main-pad">
