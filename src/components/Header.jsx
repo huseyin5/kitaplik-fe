@@ -6,7 +6,7 @@ export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, a
       <header className="topbar show-desktop">
         <div className="topbar-left">
           <div className="brand">
-            <span className="brand-emoji fx-sway">🌷</span>
+            <span className="brand-emoji">🌷</span>
             <span className="brand-name">Zeliş'in Kütüphanesi</span>
           </div>
           <nav className="nav">
@@ -14,15 +14,12 @@ export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, a
             <button className={`nav-btn${activeNav === 'library' ? ' active' : ''}`} onClick={onLibrary}>Kütüphanem</button>
           </nav>
         </div>
-        <div className="header-user">
-          <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
-          <span className="header-flutter fx-float">🦋</span>
-        </div>
+        <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
       </header>
 
       <header className="topbar show-mobile">
         <div className="brand">
-          <span className="brand-emoji fx-sway">🌷</span>
+          <span className="brand-emoji">🌷</span>
           <span className="brand-name">Zeliş'in Kütüphanesi</span>
         </div>
         <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />

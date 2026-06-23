@@ -8,18 +8,27 @@ import LibraryPage from './pages/LibraryPage.jsx'
 import { useTheme } from './hooks/useTheme.js'
 import { useSearchHistory } from './hooks/useSearchHistory.js'
 import { sameBook } from './utils/book.js'
-import { CATALOG } from './data/books.js'
+import {
+  searchBooks,
+  getBookDetail,
+  getLibrary,
+  addLibraryBook,
+  updateLibraryStatus,
+  deleteLibraryBook,
+} from './api/client.js'
 
-// The whole app runs in the browser: search filters the local catalog and the
-// library is persisted in localStorage. No accounts, no backend.
-const LIB_KEY = 'kitaplik.library'
-
-function loadLibrary() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(LIB_KEY))
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
+// Fields the backend accepts when adding a book to the library (AddLibraryBook).
+function toAddPayload(book, status) {
+  return {
+    title: book.title,
+    authors: book.authors || [],
+    isbn: book.isbn ?? null,
+    publisher: book.publisher ?? null,
+    publishedDate: book.publishedDate ?? null,
+    description: book.description ?? null,
+    pageCount: book.pageCount ?? null,
+    source: book.source,
+    status,
   }
 }
 
@@ -33,22 +42,29 @@ export default function App() {
 
   // Search state
   const [query, setQuery] = useState('')
-  const [by, setBy] = useState('title')
+  const [searchResults, setSearchResults] = useState([])
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [searchError, setSearchError] = useState(null)
+  const [hasSearched, setHasSearched] = useState(false)
 
-  // Library state (persisted)
-  const [library, setLibrary] = useState(loadLibrary)
+  // Library state
+  const [library, setLibrary] = useState([])
+  const [libLoading, setLibLoading] = useState(true)
+  const [libError, setLibError] = useState(null)
   const [libFilter, setLibFilter] = useState('all')
 
   // Detail state
   const [selectedBook, setSelectedBook] = useState(null)
+  const [detailLoading, setDetailLoading] = useState(false)
 
   const toastTimer = useRef(null)
-  useEffect(() => () => clearTimeout(toastTimer.current), [])
+  const searchAbort = useRef(null)
+  const detailToken = useRef(0)
 
-  // Keep the library in localStorage.
-  useEffect(() => {
-    try { localStorage.setItem(LIB_KEY, JSON.stringify(library)) } catch { /* storage unavailable */ }
-  }, [library])
+  useEffect(() => () => {
+    clearTimeout(toastTimer.current)
+    if (searchAbort.current) searchAbort.current.abort()
+  }, [])
 
   const showToast = useCallback((msg) => {
     setToast({ msg })
@@ -56,41 +72,113 @@ export default function App() {
     toastTimer.current = setTimeout(() => setToast(null), 2400)
   }, [])
 
-  const findEntry = useCallback((book) => library.find((l) => sameBook(l, book)) || null, [library])
-
-  // ---- Search (local filter) ----
-  const trimmed = query.trim()
-  const hasSearched = trimmed.length >= 2
-  const results = useMemo(() => {
-    const q = trimmed.toLocaleLowerCase('tr')
-    if (q.length < 2) return []
-    return CATALOG.filter((b) => (by === 'author'
-      ? (b.authors || []).join(', ').toLocaleLowerCase('tr').includes(q)
-      : b.title.toLocaleLowerCase('tr').includes(q)))
-  }, [trimmed, by])
-
-  const submitSearch = useCallback(() => { addHistory(query) }, [query, addHistory])
-  const pickHistory = useCallback((term) => { setQuery(term); addHistory(term) }, [addHistory])
-
-  // ---- Mutations ----
-  const addToLibrary = useCallback((book) => {
-    if (findEntry(book)) {
-      showToast('Bu kitap zaten rafında')
-      return
+  // ---- Library loading ----
+  const refreshLibrary = useCallback(async () => {
+    setLibLoading(true)
+    setLibError(null)
+    try {
+      const data = await getLibrary()
+      setLibrary(data?.books || [])
+    } catch (e) {
+      setLibError(e.message)
+    } finally {
+      setLibLoading(false)
     }
-    const entry = { ...book, id: book.id || `l_${Date.now()}`, status: 'okunacak', addedAt: Date.now() }
-    setLibrary((prev) => [entry, ...prev])
-    showToast('“' + book.title + '” rafına eklendi')
-  }, [findEntry, showToast])
-
-  const setStatus = useCallback((id, status) => {
-    setLibrary((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)))
   }, [])
 
-  const removeFromLibrary = useCallback((id) => {
+  useEffect(() => { refreshLibrary() }, [refreshLibrary])
+
+  const findEntry = useCallback((book) => library.find((l) => sameBook(l, book)) || null, [library])
+
+  // ---- Search ----
+  // Searches need at least 2 characters; shorter input resets to the idle state.
+  const runSearch = useCallback(async (rawQuery) => {
+    const q = (rawQuery || '').trim()
+    if (searchAbort.current) searchAbort.current.abort()
+    if (q.length < 2) {
+      searchAbort.current = null
+      setSearchResults([])
+      setHasSearched(false)
+      setSearchError(null)
+      setSearchLoading(false)
+      return
+    }
+    const controller = new AbortController()
+    searchAbort.current = controller
+    setSearchLoading(true)
+    setSearchError(null)
+    setHasSearched(true)
+    try {
+      const data = await searchBooks({ q, limit: 20, signal: controller.signal })
+      if (controller.signal.aborted) return
+      setSearchResults(data?.results || [])
+    } catch (e) {
+      if (e.name === 'AbortError') return
+      setSearchError(e.message)
+      setSearchResults([])
+    } finally {
+      if (searchAbort.current === controller) {
+        searchAbort.current = null
+        setSearchLoading(false)
+      }
+    }
+  }, [])
+
+  // Search-as-you-type: debounce input changes before hitting the API.
+  useEffect(() => {
+    const id = setTimeout(() => { runSearch(query) }, 350)
+    return () => clearTimeout(id)
+  }, [query, runSearch])
+
+  // Immediate search for the "Ara" button / Enter key; records the term.
+  const submitSearch = useCallback(() => {
+    runSearch(query)
+    addHistory(query)
+  }, [query, runSearch, addHistory])
+
+  const pickHistory = useCallback((term) => {
+    setQuery(term)
+    addHistory(term)
+  }, [addHistory])
+
+  // ---- Mutations ----
+  const addToLibrary = useCallback(async (book) => {
+    if (findEntry(book)) {
+      showToast('Bu kitap zaten kütüphanende')
+      return
+    }
+    try {
+      const created = await addLibraryBook(toAddPayload(book, 'okunacak'))
+      setLibrary((prev) => [created, ...prev])
+      showToast('“' + book.title + '” kütüphanene eklendi')
+    } catch (e) {
+      showToast(e.message)
+    }
+  }, [findEntry, showToast])
+
+  const setStatus = useCallback(async (id, status) => {
+    const previous = library
+    setLibrary((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)))
+    try {
+      const updated = await updateLibraryStatus(id, status)
+      setLibrary((prev) => prev.map((l) => (l.id === id ? updated : l)))
+    } catch (e) {
+      setLibrary(previous)
+      showToast(e.message)
+    }
+  }, [library, showToast])
+
+  const removeFromLibrary = useCallback(async (id) => {
+    const previous = library
     setLibrary((prev) => prev.filter((l) => l.id !== id))
-    showToast('Kitap rafından kaldırıldı')
-  }, [showToast])
+    try {
+      await deleteLibraryBook(id)
+      showToast('Kitap kütüphanenden kaldırıldı')
+    } catch (e) {
+      setLibrary(previous)
+      showToast(e.message)
+    }
+  }, [library, showToast])
 
   // ---- Navigation ----
   const goSearch = useCallback(() => setRoute('search'), [])
@@ -101,6 +189,18 @@ export default function App() {
     setSelectedBook(book)
     setSelectedFrom(from)
     setRoute('detail')
+    // Enrich from the detail endpoint when we have a source-specific id
+    // (search results); library books already carry full data.
+    if (from === 'search' && book.source && book.id) {
+      const token = (detailToken.current += 1)
+      setDetailLoading(true)
+      getBookDetail(book.source, book.id)
+        .then((detail) => { if (detailToken.current === token && detail) setSelectedBook(detail) })
+        .catch(() => { /* keep the list item we already have */ })
+        .finally(() => { if (detailToken.current === token) setDetailLoading(false) })
+    } else {
+      setDetailLoading(false)
+    }
   }, [])
 
   // ---- Derived ----
@@ -137,9 +237,10 @@ export default function App() {
           {route === 'search' && (
             <SearchPage
               query={query}
-              by={by}
+              loading={searchLoading}
+              error={searchError}
               hasSearched={hasSearched}
-              results={results}
+              results={searchResults}
               findEntry={findEntry}
               history={history}
               onPickHistory={pickHistory}
@@ -147,7 +248,6 @@ export default function App() {
               onClearHistory={clearHistory}
               onQueryChange={setQuery}
               onSearch={submitSearch}
-              onSetBy={setBy}
               onOpen={(book) => { addHistory(query); openBook(book, 'search') }}
               onAdd={addToLibrary}
             />
@@ -157,6 +257,7 @@ export default function App() {
             <DetailPage
               book={selectedBook}
               status={selectedStatus}
+              loading={detailLoading}
               onBack={goBack}
               onAdd={addToLibrary}
             />
@@ -167,6 +268,9 @@ export default function App() {
               filter={libFilter}
               counts={counts}
               items={libItems}
+              loading={libLoading}
+              error={libError}
+              onRetry={refreshLibrary}
               onSetFilter={setLibFilter}
               onOpen={(book) => openBook(book, 'library')}
               onStatusChange={setStatus}

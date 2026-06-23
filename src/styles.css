@@ -32,10 +32,6 @@ input, select, button { font-family: inherit; }
 /* ---------- Animations ---------- */
 @keyframes sh { 0% { background-position: 100% 0 } 100% { background-position: 0 0 } }
 @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 12px) } to { opacity: 1; transform: translate(-50%, 0) } }
-@keyframes sway { 0%, 100% { transform: rotate(-6deg) } 50% { transform: rotate(6deg) } }
-@keyframes floatY { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
-.fx-sway { display: inline-block; animation: sway 4s ease-in-out infinite; transform-origin: center bottom; }
-.fx-float { display: inline-block; animation: floatY 5s ease-in-out infinite; }
 
 /* ---------- Responsive helpers ---------- */
 .show-desktop { display: none; }
@@ -67,10 +63,10 @@ input, select, button { font-family: inherit; }
 .toast {
   position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 60;
   background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow);
-  border-radius: 999px; padding: 11px 18px; font-size: 13px; font-weight: 600; color: var(--accent);
+  border-radius: 999px; padding: 11px 18px; font-size: 13px; font-weight: 600; color: var(--text);
   display: flex; align-items: center; gap: 9px; max-width: 90vw; animation: toastIn .22s ease;
 }
-.toast-flower { font-size: 15px; line-height: 1; }
+.toast-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
 
 /* ---------- Header ---------- */
 .topbar {
@@ -96,7 +92,6 @@ input, select, button { font-family: inherit; }
   color: var(--muted); border-radius: 999px;
 }
 .nav-btn.active { color: var(--accent); }
-.header-flutter { font-size: 22px; line-height: 1; }
 
 /* ---------- Theme toggle ---------- */
 .theme-toggle {
@@ -127,46 +122,20 @@ input, select, button { font-family: inherit; }
 
 /* ---------- Page headings ---------- */
 .page-title {
-  font-family: 'Caveat', cursive; font-size: 30px; font-weight: 700; color: var(--accent);
-  margin: 2px 0 14px; display: flex; align-items: center; gap: 8px; line-height: 1.1;
+  font-size: 24px; font-weight: 700; color: var(--text);
+  margin: 4px 0 6px; line-height: 1.2; letter-spacing: -0.01em;
 }
-.page-title .title-flower { font-size: 22px; }
-
-/* ---------- Search hero ---------- */
-.search-hero {
-  position: relative; background: linear-gradient(135deg, #fde3ef 0%, #fce0f3 100%);
-  border: 1px solid var(--border); border-radius: 22px; padding: 22px 20px; margin: 2px 0 18px;
-  overflow: hidden;
-}
-[data-theme="dark"] .search-hero { background: linear-gradient(135deg, #3a1d2e 0%, #341929 100%); }
-.search-hero h1 {
-  font-family: 'Caveat', cursive; font-size: 30px; font-weight: 700; color: var(--accent);
-  margin: 0 0 4px; line-height: 1.08; max-width: 80%;
-}
-.search-hero p { font-size: 13.5px; color: var(--muted); margin: 0; max-width: 420px; line-height: 1.45; }
-.hero-petal-1 { position: absolute; right: 14px; top: 12px; font-size: 26px; }
-.hero-petal-2 { position: absolute; right: 52px; bottom: 12px; font-size: 17px; opacity: .8; }
-.hero-petal-3 { position: absolute; left: -6px; bottom: -8px; font-size: 34px; opacity: .5; }
+.page-sub { font-size: 14px; color: var(--muted); margin: 0 0 20px; line-height: 1.45; }
 
 /* ---------- Search controls ---------- */
-.search-col { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
-.search-input-wrap { position: relative; display: flex; align-items: center; }
-.search-icon { position: absolute; left: 14px; display: flex; color: var(--accent); pointer-events: none; }
+.search-row { display: flex; gap: 10px; align-items: center; margin-bottom: 22px; }
+.search-input-wrap { position: relative; display: flex; align-items: center; flex: 1; min-width: 0; }
+.search-icon { position: absolute; left: 14px; display: flex; color: var(--muted); pointer-events: none; }
 .search-input {
-  width: 100%; padding: 14px 14px 14px 42px; font-size: 16px;
+  width: 100%; padding: 13px 14px 13px 42px; font-size: 15px;
   border: 1px solid var(--border); border-radius: 999px; background: var(--card); color: var(--text);
 }
 .search-input:focus { border-color: var(--accent); outline: none; }
-.search-controls { display: flex; gap: 10px; }
-.seg {
-  display: flex; flex: 1; background: var(--hover); border: 1px solid var(--border);
-  border-radius: 999px; padding: 3px;
-}
-.seg-btn {
-  flex: 1; border: none; background: transparent; color: var(--muted);
-  padding: 11px 15px; border-radius: 999px; font-size: 13px; font-weight: 600; transition: .15s;
-}
-.seg-btn.active { background: var(--card); color: var(--accent); }
 .btn-primary {
   border: none; background: var(--accent); color: var(--accent-fg);
   padding: 11px 24px; border-radius: 999px; font-size: 14px; font-weight: 600; flex: none;
@@ -183,9 +152,7 @@ input, select, button { font-family: inherit; }
   padding: 15px 13px 13px 17px; transition: box-shadow .18s, transform .18s, border-color .18s;
 }
 .book-cover:hover { box-shadow: var(--shadow); transform: translateY(-2px); border-color: var(--accent); }
-.book-cover-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .book-spine { position: absolute; left: 0; top: 0; bottom: 0; width: 5px; }
-.cover-flower { position: absolute; right: 9px; top: 9px; font-size: 13px; opacity: .7; }
 .book-cover-title {
   font-size: 14px; font-weight: 600; line-height: 1.25; color: var(--text);
   display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
@@ -276,7 +243,6 @@ input, select, button { font-family: inherit; }
   padding: 20px 18px 16px 22px; box-shadow: var(--shadow);
 }
 .detail-cover .book-spine { width: 7px; }
-.detail-cover .cover-flower { right: 11px; top: 11px; font-size: 17px; opacity: .75; }
 .detail-cover-title { font-size: 18px; font-weight: 700; line-height: 1.22; color: var(--text); }
 .detail-cover-author { font-size: 12px; color: var(--muted); }
 .detail-main { flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 15px; }
@@ -323,41 +289,3 @@ input, select, button { font-family: inherit; }
   padding: 0 0 0 2px; display: inline-flex; border-radius: 4px;
 }
 .history-remove:hover { color: var(--danger); }
-
-/* ---------- Auth screen ---------- */
-.auth-wrap {
-  min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  padding: 24px; position: relative; overflow: hidden;
-}
-.auth-petal-1 { position: absolute; left: 8%; top: 14%; font-size: 40px; opacity: .5; }
-.auth-petal-2 { position: absolute; right: 10%; bottom: 16%; font-size: 34px; opacity: .45; }
-.auth-petal-3 { position: absolute; right: 18%; top: 22%; font-size: 22px; opacity: .55; }
-.auth-theme {
-  position: absolute; top: 20px; right: 20px;
-  width: 50px; height: 28px; border-radius: 999px; border: 1px solid var(--border);
-  background: var(--hover); padding: 0; flex: none; z-index: 2;
-}
-.auth-card {
-  width: 100%; max-width: 380px; background: var(--card); border: 1px solid var(--border);
-  border-radius: 22px; box-shadow: var(--shadow); padding: 30px 28px; position: relative; z-index: 1;
-}
-.auth-brand { display: flex; align-items: center; gap: 9px; margin-bottom: 22px; }
-.auth-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; }
-.auth-sub { font-size: 13.5px; color: var(--muted); margin: 0 0 22px; line-height: 1.5; }
-.auth-form { display: flex; flex-direction: column; gap: 14px; }
-.auth-field { display: flex; flex-direction: column; gap: 6px; }
-.auth-label { font-size: 12.5px; font-weight: 600; color: var(--muted); }
-.auth-input {
-  width: 100%; padding: 12px 14px; font-size: 14px; border: 1px solid var(--border);
-  border-radius: 999px; background: var(--page); color: var(--text);
-}
-.auth-input:focus { border-color: var(--accent); outline: none; }
-.auth-error {
-  font-size: 13px; color: var(--danger); background: rgba(214,51,108,.08);
-  border: 1px solid rgba(214,51,108,.25); border-radius: 12px; padding: 9px 12px; line-height: 1.4;
-}
-.auth-submit { width: 100%; justify-content: center; margin-top: 4px; display: inline-flex; align-items: center; gap: 6px; }
-.auth-submit:disabled { opacity: .6; cursor: default; }
-.auth-switch { margin-top: 18px; font-size: 13px; color: var(--muted); text-align: center; }
-.auth-link { border: none; background: none; color: var(--accent); font-size: 13px; font-weight: 600; padding: 0; }
-.auth-link:hover { text-decoration: underline; }
