@@ -1,0 +1,14 @@
+{
+  "name": "Zeliş'in Kütüphanesi",
+  "short_name": "Kütüphanem",
+  "description": "Kişisel kitap kütüphanesi — kitap ara, rafına ekle, okuma durumunu takip et.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff5f9",
+  "theme_color": "#e85a9b",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

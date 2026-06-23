@@ -78,8 +78,9 @@ input, select, button { font-family: inherit; }
 .topbar.show-desktop { padding: 15px 26px; }
 .topbar.show-mobile { padding: 13px 16px; }
 .brand { display: flex; align-items: center; gap: 9px; }
-.brand-emoji { font-size: 19px; line-height: 1; }
-.show-mobile .brand-emoji { font-size: 17px; }
+.brand-btn { border: none; background: none; padding: 0; cursor: pointer; }
+.brand-logo { display: block; width: 28px; height: 28px; flex: none; }
+.show-mobile .brand-logo { width: 26px; height: 26px; }
 .brand-name {
   font-family: 'Caveat', cursive; font-weight: 700; font-size: 25px;
   color: var(--accent); letter-spacing: .01em;

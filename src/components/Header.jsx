@@ -5,10 +5,10 @@ export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, a
     <>
       <header className="topbar show-desktop">
         <div className="topbar-left">
-          <div className="brand">
-            <span className="brand-emoji">🌷</span>
+          <button className="brand brand-btn" onClick={onSearch} aria-label="Ana sayfaya git">
+            <img className="brand-logo" src="/logo.svg" alt="" width="28" height="28" />
             <span className="brand-name">Zeliş'in Kütüphanesi</span>
-          </div>
+          </button>
           <nav className="nav">
             <button className={`nav-btn${activeNav === 'search' ? ' active' : ''}`} onClick={onSearch}>Ara</button>
             <button className={`nav-btn${activeNav === 'library' ? ' active' : ''}`} onClick={onLibrary}>Kütüphanem</button>
@@ -18,10 +18,10 @@ export default function Header({ onLibrary, resolved, onToggleTheme, onSearch, a
       </header>
 
       <header className="topbar show-mobile">
-        <div className="brand">
-          <span className="brand-emoji">🌷</span>
+        <button className="brand brand-btn" onClick={onSearch} aria-label="Ana sayfaya git">
+          <img className="brand-logo" src="/logo.svg" alt="" width="26" height="26" />
           <span className="brand-name">Zeliş'in Kütüphanesi</span>
-        </div>
+        </button>
         <ThemeToggle resolved={resolved} onToggle={onToggleTheme} />
       </header>
     </>
